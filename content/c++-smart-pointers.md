@@ -2,79 +2,142 @@ Overview of C++ smart pointers.
 
 REDO THIS: "FACTORY" style object for unique pointer, smart pointer and weak pointer.  also provide a single example for each
 
-The problem:
+The problem[^2]:
 
 ````c++
-class C {...};
 
-C* get_c() {
-    C* ptr = new C();
-
-    return ptr;
+std::vector<int>* get_v() {
+    return new std::vector<int>(1, 42);
 };
 ````
 
-The issue is that to ensure there are no memory (and potentially other resource) leaks, the caller must be sure to call ```` delete ```` on the returned pointer.  In general, designers of C++ libraries try to ensure that all allocated objects are manageable by the caller either by requiring that calling code itself call ```` new ```` or by attaching objects to existing interface objects so that they are transitively managed by proper management of those objects.
-
-The word often used to describe this relationship is *ownership*.  In the case below, object 0 owns the vector.
+The issue is that to ensure there are no memory (and potentially other resource) leaks, the caller must be sure to call ```` delete ```` on the returned pointer.  I'll use a block scope to be precise about the problem, but in general this issue comes in to play when different objects need access to the same data.
 
 ````c++
-class O {
+std::vector<int>* copy;
 
+{
+    std::vector<int>* orig = get_v();
+    copy = orig;
+
+    // Can't call delete here (unless you copy v)
+}
+
+std::cout << *copy[0] << std::endl;
+
+// Have to remember to call delete 
+delete copy;
+````
+
+A much more standard approach to the problem is to have an object manage the lifetime of the vector.
+
+````c++
+class VOwner {
+    std::vector<int> v_;
 public:
-    O() : v_(new std::vector<int>()) {}
-    ~O() { delete v_; }
+    VOwner() : v_(1, 42) {}
 
-    std::vector<int>* v() { return v_; }
-private:
-    std::vector<int>* v_;
+    // Returning a pointer for consistency, but a reference might be a better idea in practice
+    std::vector<int>* get_v() { return v_; }
 };
 ````
 
-A key constraint introduced by this relationship is that any caller of ````O::v```` must not use the pointer after the associated ````O```` object has been destroyed.  In many cases this constraint does not impose a significant burden, but in some cases it is problematic.  For example, if several clients should share one ````O```` object, the developer needs to design a system to ensure that the lifetime of the ````O```` object exceeds the lifetime of the clients.
-
-*Shared pointers*, such as ````std::shared_ptr````, remove this constraint by allowing multiple objects to share ownership.
+In this case, we say that the ````VOwner```` object *owns* the vector.  While that removes the need to delete the vector, the user must now ensure that the VOwner object has a longer lifetime than any caller of ````VOwner::get_v````.
 
 ````c++
-class S {
+std::vector<int>* copy;
 
-public:
-    S(): v_(std::make_shared(new std::vector<int>())) {}
-    // Note: default destructor is sufficient for this object
+{
+    VOwner orig;
+    copy = orig.get_v();
+    // Oops, vector gets cleared when orig goes out of scope
+}
 
-    std::shared_ptr<std::vector<int>> v() { return v_; }
-
-private:
-    std::shared_ptr<std::vector<int>> v_;
-};
+// Kaboom
+std::cout << *copy[0] << std::endl;
 ````
 
-Objects pointed to by shared pointers are deleted only when all of the shared pointers that reference the same object are destroyed[^1].
+In many cases it isn't hard to structure the program so that the owner object can outlast all of its users.  However, this structure can be burdensome in cases where lifetime dependencies are hard to unravel, or worse, fundamentally entangled.
 
-Shared pointers are useful for objects that need to be referenced by consumers whose lifetimes you do not wish to relate.  Another common case is that you want to ensure that a single owner is responsible for an object, but you wish to allow that ownership to be transferred.
+Smart pointers implement ownership in a way that allows it to be decoupled with object lifetimes.
+
+# Unique pointers
+
+Unique pointers (````std::unique_ptr<T>````) ensure that an object has exactly one owner.  It is possible to change the owner by copying, assigning or moving the unique pointer.  That allows us to safely implement the original example[^1].
 
 ````c++
-class U {
+std::unqiue_ptr<vector<int>> get_unique_v() {
+    return std::make_unique(vector<int>(1, 42));
+}
 
+std::unique_ptr<vector<int>> copy;
+
+{
+    std::unique_ptr<vector<int>> orig = get_unique_v();
+    // Ownership is now associated with copy instead of orig.  Note that after this statement
+    // orig can no longer be used to access the vector
+    copy = orig;
+}
+
+std::cout << *copy[0] std::endl;
+
+// The vector will be freed when copy goes out of scope, no need to manually call delete
+````
+
+# Shared pointers
+
+Unique pointers are appropriate when you wish to describe transfer of ownership, but another common case is that a single object instance needs to be shared by multiple clients.  This capability is useful when the instance in question is expensive to construct, for example.  Shared pointers (````std::shared_ptr````) can be used to allow clients to mutually guarantee the lifetime of a single instance.
+
+````c++
+class VShared {
+    std::shared_ptr<vector<int>> v_;
 public:
-    U() {}
+    VShared() : v_(make_shared(vector<int>(1, 42))) {}
+    std::shared_ptr<vector<int>> get_v() { return v_; }
+    };
 
-    std::unique_ptr<std::vector<int>> v() { return make_unique(new std::vector<int>()); }
+std::shared_ptr<vector<int>> copy;
 
-    // Note: there's no point in keeping the vector as a private variable here for this example, since it would just be transferred when v() is called
+{
+    VShared orig;
+
+    // Assignent operator increments reference count, so the vector
+    // remains after orig goes after scope
+    copy = orig.get_v();
+}
+
+std::cout << *copy[0] << std::endl;
+````
+
+# Weak pointers
+
+The above example will persist the vector until the VShared object is deleted.  In some cases that may be an undesirable use of resources, and one might prefer to release the object if no clients are actively using it while still avoiding having multiple instances created at the same time.  Weak pointers (````std::weak_ptr````) allow safe access to objects managed by ````std::shared_ptr```` without participating in the lifetime of the object.
+
+````c++
+class VCached {
+    std::weak_ptr<vector<int>> v_;
+public:
+    std::shared_ptr<vector<int>> get_v() {
+        if (v_.???) {
+        return ???;
+        }
+        auto v = std::make_shared(std::vector<int>(1, 42));
+        v_ = ???
+        return v;
+    }
 };
 ````
 
-Weak pointers are used when you wish to provide a pointer to something held by a shared pointer withot taking ownership of it.  A weak pointer may bepreferable to a raw pointer for this purpose because it ensures the shared pointer is live prior to accessing the object.
+Note that the nature of weak pointers is that the object they point to may not exist.  The benefit they have over raw pointers is that attempting to use them after the underlying object has been freed leads to an exception as opposed to accessing memory inappropriately.
 
 [//]: # Footnotes
 
 [^1]: There is an important technical caveat to this statement, however.  The smart pointers themselves must be copied, not the contents of the smart     pointer.
     For example, this works
     ````c++
-    std::shared_ptr<int> copy;
+    std::weak_ptr<int> copy;
     {
-        std::shared_ptr<int> orig = std::make_shared(new int(42));
+        std::weak_ptr<int> orig = std::make_shared(new int(42));
 
         // Assignment operator increments the reference count
         copy = orig;
@@ -85,9 +148,9 @@ Weak pointers are used when you wish to provide a pointer to something held by a
     ````
     But this doesn't
     ````c++
-    std::shared_ptr<int> copy;
+    std::weak_ptr<int> copy;
     {
-        std::shared_ptr<int> orig = std::make_shared(new int(42));
+        std::weak_ptr<int> orig = std::make_shared(new int(42));
 
         // The reference count never gets updated
         copy.set(orig.get());
@@ -98,5 +161,6 @@ Weak pointers are used when you wish to provide a pointer to something held by a
     // Now copy points to freed memory
     std::cout << *copy << endl;
     ````
-    
+
+[^2]: std::vector<int> is being used here for illustration.  I typically run in to this problem with complex objects that require a lot of context to initialize, but can then be used after initialization by different clients.
     
