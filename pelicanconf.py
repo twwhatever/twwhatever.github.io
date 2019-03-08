@@ -20,11 +20,11 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-LINKS = (('Resumé', 'https://1drv.ms/b/s!AneqjxvDOTb4iuBY91luU_VcFNcquQ'),
+LINKS = (('Résumé', 'https://1drv.ms/b/s!AneqjxvDOTb4iuBY91luU_VcFNcquQ'),
          ('My old page', 'http://pages.cs.wisc.edu/~wildt/'),)
 
 # Social widget
-SOCIAL = (('LinkedIn', 'https://www.linkedin.com/in/ted-wild-b0b458175'),
+SOCIAL = (('LinkedIn', 'https://www.linkedin.com/in/ted-wild'),
           ('GitHub', 'https://github.com/twwhatever'),)
 
 DEFAULT_PAGINATION = False
