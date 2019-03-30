@@ -1,2 +1,0 @@
-# twwhatever.github.io
-Blog
