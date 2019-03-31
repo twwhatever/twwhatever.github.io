@@ -54,7 +54,11 @@ My plan was to generate the Python bindings using the following
 command in the demo directory via 
 
 ````
-python -m grpc_tools.protoc -I../proto-wrong/ --python_out=twwhatever/demo --grpc_python_out=twwhatever/demo ../proto-wrong/*.proto
+python -m grpc_tools.protoc \
+    -I../proto-wrong/ \
+    --python_out=twwhatever/demo \
+    --grpc_python_out=twwhatever/demo \
+    ../proto-wrong/*.proto
 ````
 
 That command succeeded and generates the bindings as expected.  When I
@@ -100,12 +104,16 @@ Changing the import statement in service.proto to
 
 ````proto
 import "twwhatever/demo/message.proto" 
-`````
+````
 
 And invoking the command from the Python directory like
 
 ````
-python -m grpc_tools.protoc -I../proto/ --python_out=. --grpc_python_out=. ../proto/twwhatever/demo/*.proto
+python -m grpc_tools.protoc \
+    -I../proto/ \
+    --python_out=. \
+    --grpc_python_out=. \
+    ../proto/twwhatever/demo/*.proto
 ````
 
 That way I got a package twwhatever.demo and I could use
