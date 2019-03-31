@@ -22,13 +22,17 @@ all the protobuf definitions for a package in a single file.  In that
 case, you won't have this problem at all.  However, the workaround
 presented here is not onerous, especially if followed from the start.
 
+For concreteness, there is a
+[simple demo](https://github.com/twwhatever/demo-grpc-python) that
+illustrates both the incorrect and working structures.
+
 The initial setup I had was the following directory structure
-* root
-** proto
-*** message.proto
-*** service.proto
-** demo
-*** demo.py
+
+* proto/
+    * message.proto
+    * service.proto
+* demo/
+    * demo.py
 
 With message.proto
 
@@ -91,14 +95,12 @@ There appear to be a couple workarounds:
 * Mirror the directory structure of your protocol buffer definitions - in particular your import statements - with your target Python package
 
 In this case, it meant setting up the repository like this
-* root
-** proto
-*** twwhatever
-**** demo
-***** message.proto
-***** service.proto
-** demo
-*** demo.py
+
+* proto/twwhatever/demo/
+    * message.proto
+    * service.proto
+* demo/
+    * demo.py
 
 Changing the import statement in service.proto to
 
