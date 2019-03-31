@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
-        <title>Ted Wild's Blog</title>
+        <title>gRPC layout for Python</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
         <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Ted Wild's Blog Atom Feed" />
 
@@ -15,13 +15,18 @@
         <header id="banner" class="body">
                 <h1><a href="/">Ted Wild's Blog </a></h1>
                 <nav><ul>
-                    <li><a href="/category/tips.html">Tips</a></li>
+                    <li class="active"><a href="/category/tips.html">Tips</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/grpc-python.html" rel="bookmark"
+           title="Permalink to gRPC layout for Python">gRPC layout for Python</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/grpc-python.html">gRPC layout for Python</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-03-30T20:30:00-07:00">
                 Published: Sat 30 March 2019
@@ -32,7 +37,7 @@
         </address>
 <p>In <a href="/category/tips.html">Tips</a>.</p>
 <p>tags: <a href="/tag/grpc.html">gRPC</a> <a href="/tag/python.html">Python</a> </p>
-</footer><!-- /.post-info --><p>I recently ran in to a minor issue using gRPC in Python.  It turns out
+</footer><!-- /.post-info -->      <p>I recently ran in to a minor issue using gRPC in Python.  It turns out
 that there are constraints on the .proto directory structure if you
 want to build a Python package out of multiple .proto files.  This
 constraint doesn't appear to affect the Maven or NuGet plugins, which
@@ -151,36 +156,11 @@ work because the generated code service_pb2_grpc.proto contains the statement</p
 additional submodule structure (e.g., twwhatever/demo/mypackage, etc.).</p>
 <p>The takeaway seems to be to put all the protocol buffer definitions
 for a project under the same directory structure, and possibly better
-yet in the same .proto file.</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+yet in the same .proto file.</p>
+    </div><!-- /.entry-content -->
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/c++-smart-pointers.html" rel="bookmark"
-                           title="Permalink to Overview of C++ smart pointers">Overview of C++ smart pointers</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-02-17T22:40:00-08:00">
-                Published: Sun 17 February 2019
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/ted-wild.html">Ted Wild</a>
-        </address>
-<p>In <a href="/category/tips.html">Tips</a>.</p>
-<p>tags: <a href="/tag/c.html">C++</a> </p>
-</footer><!-- /.post-info -->                <p>Examples of using C++ smart pointers to manage ownership</p>
-                <a class="readmore" href="/c++-smart-pointers.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>

@@ -21,7 +21,150 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/c++-smart-pointers.html">Overview of C++ smart pointers</a></h1>
+                    <h1 class="entry-title"><a href="/grpc-python.html">gRPC layout for Python</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-03-30T20:30:00-07:00">
+                Published: Sat 30 March 2019
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/ted-wild.html">Ted Wild</a>
+        </address>
+<p>In <a href="/category/tips.html">Tips</a>.</p>
+<p>tags: <a href="/tag/grpc.html">gRPC</a> <a href="/tag/python.html">Python</a> </p>
+</footer><!-- /.post-info --><p>I recently ran in to a minor issue using gRPC in Python.  It turns out
+that there are constraints on the .proto directory structure if you
+want to build a Python package out of multiple .proto files.  This
+constraint doesn't appear to affect the Maven or NuGet plugins, which
+caused me to waste a bunch of time since I got those working first and
+assumed that other language plugins would be the same.  The issue and solution are
+described in detail in this
+<a href="https://github.com/protocolbuffers/protobuf/issues/1491">GitHub issue</a>.
+In the following, I'll go over an example that reproduces my initial
+mistake and a fixed version.</p>
+<p>The gRPC developers in the GitHub issue recommend keeping
+all the protobuf definitions for a package in a single file.  In that
+case, you won't have this problem at all.  However, the workaround
+presented here is not onerous, especially if followed from the start.</p>
+<p>For concreteness, there is a
+<a href="https://github.com/twwhatever/demo-grpc-python">simple demo</a> that
+illustrates both the incorrect and working structures.</p>
+<p>The initial setup I had was the following directory structure</p>
+<ul>
+<li>proto/<ul>
+<li>message.proto</li>
+<li>service.proto</li>
+</ul>
+</li>
+<li>demo/<ul>
+<li>demo.py</li>
+</ul>
+</li>
+</ul>
+<p>With message.proto</p>
+<div class="highlight"><pre><span></span><span class="na">syntax</span> <span class="o">=</span> <span class="s">&quot;proto3&quot;</span><span class="p">;</span>
+<span class="kn">package</span> <span class="nn">twwhatever</span><span class="o">.</span><span class="n">demo</span><span class="p">;</span>
+<span class="kd">message</span> <span class="nc">DemoMessage</span> <span class="p">{</span>
+    <span class="kt">string</span> <span class="na">m</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>and service.proto</p>
+<div class="highlight"><pre><span></span><span class="na">syntax</span> <span class="o">=</span> <span class="s">&quot;proto3&quot;</span><span class="p">;</span>
+<span class="kn">package</span> <span class="nn">twwhatever</span><span class="o">.</span><span class="n">demo</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">&quot;message.proto&quot;</span><span class="p">;</span>
+<span class="kd">service</span> <span class="n">DemoService</span> <span class="p">{</span>
+    <span class="k">rpc</span> <span class="n">Function</span> <span class="p">(</span><span class="n">DemoMessage</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="n">DemoMessage</span><span class="p">)</span> <span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>My plan was to generate the Python bindings using the following
+command in the demo directory via </p>
+<div class="highlight"><pre><span></span>python -m grpc_tools.protoc \
+    -I../proto-wrong/ \
+    --python_out=twwhatever/demo \
+    --grpc_python_out=twwhatever/demo \
+    ../proto-wrong/*.proto
+</pre></div>
+
+
+<p>That command succeeded and generates the bindings as expected.  When I
+tried to create a service, though, I got an error.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">twwhatever.demo</span> <span class="kn">import</span> <span class="n">service_pb2_grpc</span>
+<span class="kn">from</span> <span class="nn">twwhatever.demo</span> <span class="kn">import</span> <span class="n">message_pb2</span>
+
+<span class="k">class</span> <span class="nc">Demo</span><span class="p">(</span><span class="n">service_pb2_grpc</span><span class="o">.</span><span class="n">DemoServiceServicer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">Function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">message_pb2</span><span class="o">.</span><span class="n">DemoMessage</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="s1">&#39;Hi there!&#39;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">demo</span> <span class="o">=</span> <span class="n">Demo</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">demo</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span>
+</pre></div>
+
+
+<p>Unfortunately, importing the definitions in service.proto doesn't
+work because the generated code service_pb2_grpc.proto contains the statement</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">message_pb2</span> <span class="kn">as</span> <span class="nn">message__pb2</span>
+</pre></div>
+
+
+<p>which doesn't work because message_pb2 is actually in the twwhatever.demo module.</p>
+<p>There appear to be a couple workarounds:
+<em> Keep all the protocol buffer definitions you need in a single file
+</em> Mirror the directory structure of your protocol buffer definitions - in particular your import statements - with your target Python package</p>
+<p>In this case, it meant setting up the repository like this</p>
+<ul>
+<li>proto/twwhatever/demo/<ul>
+<li>message.proto</li>
+<li>service.proto</li>
+</ul>
+</li>
+<li>demo/<ul>
+<li>demo.py</li>
+</ul>
+</li>
+</ul>
+<p>Changing the import statement in service.proto to</p>
+<div class="highlight"><pre><span></span><span class="k">import</span> <span class="s">&quot;twwhatever/demo/message.proto&quot;</span> 
+</pre></div>
+
+
+<p>And invoking the command from the Python directory like</p>
+<div class="highlight"><pre><span></span>python -m grpc_tools.protoc \
+    -I../proto/ \
+    --python_out=. \
+    --grpc_python_out=. \
+    ../proto/twwhatever/demo/*.proto
+</pre></div>
+
+
+<p>That way I got a package twwhatever.demo and I could use</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">twwhatever.demo</span> <span class="kn">import</span> <span class="n">service_pb2_grpc</span>
+<span class="kn">from</span> <span class="nn">twwhatever.demo</span> <span class="kn">import</span> <span class="n">message_pb2</span>
+</pre></div>
+
+
+<p>It appears that the same strategy works if you add
+additional submodule structure (e.g., twwhatever/demo/mypackage, etc.).</p>
+<p>The takeaway seems to be to put all the protocol buffer definitions
+for a project under the same directory structure, and possibly better
+yet in the same .proto file.</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/c++-smart-pointers.html" rel="bookmark"
+                           title="Permalink to Overview of C++ smart pointers">Overview of C++ smart pointers</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2019-02-17T22:40:00-08:00">
                 Published: Sun 17 February 2019
@@ -32,143 +175,12 @@
         </address>
 <p>In <a href="/category/tips.html">Tips</a>.</p>
 <p>tags: <a href="/tag/c.html">C++</a> </p>
-</footer><!-- /.post-info --><p>The problem<sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup>:</p>
-<div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span> <span class="n">get_v</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
-<span class="p">};</span>
-</pre></div>
-
-
-<p>To ensure there are no memory leaks, the caller must call <code>delete</code> on the
-returned pointer.  I'll use a block scope to illustrate, but in general this issue comes in to play when objects with
-different lifetimes need access to the same data.</p>
-<div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span> <span class="n">copy</span><span class="p">;</span>
-
-<span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span> <span class="n">orig</span> <span class="o">=</span> <span class="n">get_v</span><span class="p">();</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">orig</span><span class="p">;</span>
-
-    <span class="c1">// Can&#39;t call delete here (unless you copy v)</span>
-<span class="p">}</span>
-
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">copy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-
-<span class="c1">// Have to remember to call delete </span>
-<span class="k">delete</span> <span class="n">copy</span><span class="p">;</span>
-</pre></div>
-
-
-<p>A standard approach to the problem is to have an object manage the lifetime of the vector.</p>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">VOwner</span> <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">v_</span><span class="p">;</span>
-<span class="k">public</span><span class="o">:</span>
-    <span class="n">VOwner</span><span class="p">()</span> <span class="o">:</span> <span class="n">v_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span> <span class="p">{}</span>
-
-    <span class="c1">// Returning a pointer for consistency, but a reference might be a better idea in practice</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span> <span class="n">get_v</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">v_</span><span class="p">;</span> <span class="p">}</span>
-<span class="p">};</span>
-</pre></div>
-
-
-<p>In this case, we say that the <code>VOwner</code> object <em>owns</em> the vector.  While that removes the need to delete the vector, the user must now ensure that the VOwner object has a longer lifetime than any caller of <code>VOwner::get_v</code>.</p>
-<div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span> <span class="n">copy</span><span class="p">;</span>
-
-<span class="p">{</span>
-    <span class="n">VOwner</span> <span class="n">orig</span><span class="p">;</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">orig</span><span class="p">.</span><span class="n">get_v</span><span class="p">();</span>
-    <span class="c1">// Oops, vector gets destroyed when orig goes out of scope</span>
-<span class="p">}</span>
-
-<span class="c1">// Kaboom</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="o">*</span><span class="n">copy</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</pre></div>
-
-
-<p>In many cases the program can be structured so that the owner object
-can outlive all of its users.  However, in some cases this structure
-can be burdensome if lifetime dependencies are hard to unravel, or worse, fundamentally entangled.</p>
-<p>Smart pointers allow safe access to objects on the heap without
-coupling the access to the client object lifetime.</p>
-<h1>Unique pointers</h1>
-<p>Unique pointers (<code>std::unique_ptr</code>) ensure that an object has exactly one owner.  It is possible to change the owner by moving the unique pointer.  That allows us to safely implement the original example<sup id="fnref:2"><a class="footnote-ref" href="#fn:2" rel="footnote">2</a></sup>.</p>
-<div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unqiue_ptr</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">get_unique_v</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">copy</span><span class="p">;</span>
-
-<span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">orig</span> <span class="o">=</span> <span class="n">get_unique_v</span><span class="p">();</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">orig</span><span class="p">);</span>
-    <span class="c1">// Now orig can no longer be used to access the vector</span>
-<span class="p">}</span>
-
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="o">*</span><span class="n">copy</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-
-<span class="c1">// The vector will be freed when copy goes out of scope, no need to manually call delete</span>
-</pre></div>
-
-
-<h1>Shared pointers</h1>
-<p>Another common case is when a single object instance needs to be shared by multiple clients.  This capability is useful when the instance is expensive to construct, for example.  Shared pointers (<code>std::shared_ptr</code>) can be used to allow clients to mutually guarantee the lifetime of a single instance.</p>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">VShared</span> <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">v_</span><span class="p">;</span>
-<span class="k">public</span><span class="o">:</span>
-    <span class="n">VShared</span><span class="p">()</span> <span class="o">:</span> <span class="n">v_</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">))</span> <span class="p">{}</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">get_v</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">v_</span><span class="p">;</span> <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">copy</span><span class="p">;</span>
-
-<span class="p">{</span>
-    <span class="n">VShared</span> <span class="n">orig</span><span class="p">;</span>
-
-    <span class="c1">// Assignent operator increments reference count, so the vector</span>
-    <span class="c1">// remains after orig goes after scope</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">orig</span><span class="p">.</span><span class="n">get_v</span><span class="p">();</span>
-<span class="p">}</span>
-
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="o">*</span><span class="n">copy</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</pre></div>
-
-
-<h1>Weak pointers</h1>
-<p>The above example will persist the vector until the VShared object is
-deleted.  In some cases, one might prefer to release the object if no
-clients are actively using it, while still avoiding creating multiple
-instances if one already exists.  Weak pointers (<code>std::weak_ptr</code>) allow safe access to objects managed by <code>std::shared_ptr</code> without participating in the lifetime of the object.</p>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">VCached</span> <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">weak_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">v_</span><span class="p">;</span>
-<span class="k">public</span><span class="o">:</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">get_v</span><span class="p">()</span> <span class="p">{</span>
-        <span class="k">auto</span> <span class="n">candidate</span> <span class="o">=</span>  <span class="n">v_</span><span class="p">.</span><span class="n">lock</span><span class="p">();</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">candidate</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="n">candidate</span><span class="p">;</span>
-        <span class="p">}</span>
-        <span class="k">auto</span> <span class="n">v</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
-        <span class="n">v_</span> <span class="o">=</span> <span class="n">v</span><span class="p">;</span>
-        <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">};</span>
-</pre></div>
-
-
-<p>Note that the nature of weak pointers is that the object they point to
-may not exist.  The benefit they have over raw pointers is that
-attempting to use them after the underlying object has been freed
-leads to a controlled failure.</p>
-<div class="footnote">
-<hr>
-<ol>
-<li id="fn:1">
-<p><code>std::vector&lt;int&gt;</code> is being used here for illustration.  I typically run in to this problem with complex objects that require a lot of context to initialize, but can then be used after initialization by different clients.&#160;<a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
-</li>
-<li id="fn:2">
-<p>There is an important technical caveat to this statement, however.  The smart pointers themselves must be copied, not the contents of the smart     pointer.&#160;<a class="footnote-backref" href="#fnref:2" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
-</li>
-</ol>
-</div>                </article>
-            </aside><!-- /#featured -->
+</footer><!-- /.post-info -->                <p>Examples of using C++ smart pointers to manage ownership</p>
+                <a class="readmore" href="/c++-smart-pointers.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>
