@@ -20,7 +20,7 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-LINKS = (('Résumé', 'https://1drv.ms/b/s!AneqjxvDOTb4iuBY91luU_VcFNcquQ'),
+LINKS = (('Résumé', 'https://blog.tedwild.dev/extras/tedwild.pdf'),
          ('My old page', 'http://pages.cs.wisc.edu/~wildt/'),)
 
 # Social widget
