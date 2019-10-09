@@ -14,4 +14,18 @@ In Windows and Linux, the "Alt" key (on either side of the spacebar) is a great 
 
 On Macs, the "Command" key (also on either side fo the spacebar) is used heavily in system shortcuts.  That means that care is needed to interpret it as a "Meta" key: Command-f is usually interpreted as "find," but Emacs uses it for "forward-word," for example.
 
-The result was that my setup had become a terrible comp
+The result was that I felt like I was constantly hitting the wrong keys, even after remapping keys or selecting Emacs bindings in my applications.  Worse, I started to feel like I was constantly dithering over the correct key in the correct context, which felt terrible in terms of maintaining focus on actual work.
+
+# Vi to the rescue
+
+I've noticed that applications I use tend to have fairly developed Vi modes, often supporting significantly more features than the Emacs modes.  I suspect that has something to do with the modal nature of Vi, since keystrokes in command mode can be interpreted by the mode itself.  My hypothesis is that using Vi bindings when possible will reduce friction between applications, and that using them uniformly will make learning faster.
+
+So far, things seem to be going well.  I've switched to evil-mode in Spacemacs, vi mode in Bash, and VSCodeVim in VSCode.  I haven't done anything with Chrome, but it seems like there's some options for that as well.  After a few weeks, I'm getting better at navigation (which I find even better than Emacs), and am starting to get used to text manipulation.
+
+# Tips
+
+There's a few things I've already found that are very helpful
+
+  * Karabiner-elements: I use this to 
+    * Change Caps Lock to Esc if tapped and Ctrl if held.  I've found that super useful
+    * Switch Alt and Windows/Menu keys when I use my external Microsoft keyboard.  For whatever reason, Alt gets mapped to Option instead of Command by default
