@@ -1,3 +1,6 @@
+Title: Full tensors in Torchscript
+Date: 2020-02-08 13:30
+Category: tips, torchscript
 
 # Full tensors in Torchscript
 
