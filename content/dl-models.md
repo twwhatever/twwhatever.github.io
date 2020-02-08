@@ -47,3 +47,18 @@ The final expression is on the order of the J expression, especially if we reduc
 
 
 Julia also seems to be gaining some popularity in Machine Learning circles recently.  
+
+```julia
+[ sum(k .* A[i:i + size(k, 1) - 1, j: j + size(k, 2) - 1]) for i = 1:1 + (size(A, 1) - size(k, 1)), j = 1:1 + (size(A, 2) - size(k, 2)) ]
+```
+
+The definition actually matches the textbook definition fairly well, but the calls to `size` actually take up a bunch of space.  As in Python, auxilliary definitions help.
+
+```julia
+vr = [ 1 : 1 + size(A, i) - size(k, i) for i in 1:ndims(A) ]
+s(A, k, i, j) = A[i : i + size(k, 1) - 1, j : j + size(k, 2) - 1]
+
+[sum(k .* s(A, k, i, j)) for i = vr[0], j = vr[1]]
+```
+
+Julia's got a metaprogramming system that might make this even nicer, in particular cleaning up the need to define the multidimensional array index ranges in separate expressions.
