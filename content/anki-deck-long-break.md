@@ -1,6 +1,7 @@
 Title: Anki settings after a long break
 Date: 2020-06-18 19:30
-Category: anki, tips
+Category: Studying
+Tags: anki, tips
 
 # Anki settings after a long break
 

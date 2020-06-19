@@ -1,7 +1,7 @@
 Title: gRPC layout for Python
 Date: 2019-03-30 20:30
-Category: Tips
-Tags: gRPC, Python
+Category: Programming
+Tags: gRPC, Python, tips
 Slug: grpc-python
 Authors: Ted Wild
 Summary: Setting up a layout for gRPC files that works seamlessly with Python

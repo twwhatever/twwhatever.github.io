@@ -1,6 +1,7 @@
 Title: Experimenting with Vim emulations in all apps
 Date: 2020-01-01 4:30
-Category: vanity, vim
+Category: Productivity
+Tags: vanity, vim
 
 # Background
 

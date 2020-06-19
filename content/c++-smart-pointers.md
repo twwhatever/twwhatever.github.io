@@ -1,6 +1,6 @@
 Title: Overview of C++ smart pointers
 Date: 2019-02-17 22:40
-Category: Tips
+Category: Programming
 Tags: C++
 Slug: c++-smart-pointers
 Authors: Ted Wild
