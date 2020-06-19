@@ -5,6 +5,7 @@ Category: anki, tips
 # Anki settings after a long break
 
 The standard advice when returning to an Anki deck after a long break is
+
   1. Create a filtered deck that contains cards that are recently due (say, within a week)
   2. Review remaining backlog little by little until all reviews are cleared
 
