@@ -1,6 +1,6 @@
 Title: Setting up AWS EC2 instances for system design
 Date: 2022-01-20 16:00
-Category: Ops
+Category: Studying
 Tags: AWS, Python, NGINX
 Slug: aws-ec2-setup
 Authors: Ted Wild
