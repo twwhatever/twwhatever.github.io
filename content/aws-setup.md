@@ -35,7 +35,7 @@ sudo amazon-linux-extras install nginx1
 sudo systemctl start nginx.service
 ```
 You should now see the NGINX test page when you open the URL for your EC2 instance.  You can then configure it by editing `/etc/nginx/nginx.conf` and restarting NGINX with `sudo nginx -s reload`.  [This tutorial](https://gist.github.com/soheilhy/8b94347ff8336d971ad0) has a bunch of good basics for NGINX forwarding rules.  In this case, we can forward requests for a given path to a Tornado service that we'll set up.  Add the following to the `server` section:
-```
+```nginx
 	location /test {
         rewrite ^/test(.*) /$1 break;
 	    proxy_pass http://127.0.0.1:8888;
@@ -44,4 +44,4 @@ You should now see the NGINX test page when you open the URL for your EC2 instan
 
 ## Running the server
 
-Now we can start up the Python server.  `pip3 install tornado`, then copy the [hello, world](https://www.tornadoweb.org/en/stable/#hello-world) sample code in to a file `hello_world.py`.  Finish off with a strong `python3 hello_world.py`, and you should be able to open http://public-ip/test and marvel at your results.
+Now we can start up the Python server.  `pip3 install tornado`, then copy the [hello, world](https://www.tornadoweb.org/en/stable/#hello-world) sample code in to a file `hello_world.py`.  Finish off with a strong `python3 hello_world.py`, and you should be able to open `http://public-ip/test` and marvel at your results.
