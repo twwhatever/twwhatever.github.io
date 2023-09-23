@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
-        <title>Ted Wild's Blog - Ted Wild</title>
+        <title>Setting up AWS EC2 instances for system design</title>
         <link rel="stylesheet" href="https://blog.tedwild.dev/theme/css/main.css" />
 
         <!--[if IE]>
@@ -16,13 +16,18 @@
                 <nav><ul>
                     <li><a href="https://blog.tedwild.dev/category/productivity.html">Productivity</a></li>
                     <li><a href="https://blog.tedwild.dev/category/programming.html">Programming</a></li>
-                    <li><a href="https://blog.tedwild.dev/category/studying.html">Studying</a></li>
+                    <li class="active"><a href="https://blog.tedwild.dev/category/studying.html">Studying</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="https://blog.tedwild.dev/aws-ec2-setup.html" rel="bookmark"
+           title="Permalink to Setting up AWS EC2 instances for system design">Setting up AWS EC2 instances for system design</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="https://blog.tedwild.dev/aws-ec2-setup.html">Setting up AWS EC2 instances for system design</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2022-01-20T16:00:00-08:00">
                 Published: Thu 20 January 2022
@@ -33,7 +38,7 @@
         </address>
 <p>In <a href="https://blog.tedwild.dev/category/studying.html">Studying</a>.</p>
 <p>tags: <a href="https://blog.tedwild.dev/tag/aws.html">AWS</a> <a href="https://blog.tedwild.dev/tag/python.html">Python</a> <a href="https://blog.tedwild.dev/tag/nginx.html">NGINX</a> </p>
-</footer><!-- /.post-info --><p>I found a bunch of system design learning material fairly abstract, which makes me feel less confident.  The goal is to make things more concrete by setting up some of the problems and playing around with the implementations.  The result's obviously not going to be production grade, but it should be enough to gain some confidence in some specific points.</p>
+</footer><!-- /.post-info -->      <p>I found a bunch of system design learning material fairly abstract, which makes me feel less confident.  The goal is to make things more concrete by setting up some of the problems and playing around with the implementations.  The result's obviously not going to be production grade, but it should be enough to gain some confidence in some specific points.</p>
 <p>One of the neat things about the modern cloud providers is that you can play around with large scale systems directly.  It seems to me like it should be possible to set up a playground that lets you dig in to real design issues to the depth you want.  You can configure provided pieces at a high level, and drill in to the specific components to whatever level of detail you want.</p>
 <h1>Running a Python webserver</h1>
 <p>These instructions are to get the <a href="https://www.tornadoweb.org/en/stable/">Tornado</a> server running and accessible on an EC2 instance.  The idea isn't to demonstrate brilliant use of AWS capabilities at this point, but to get something very basic set up so that you can iterate on it.</p>
@@ -63,58 +68,11 @@ sudo systemctl start nginx.service
 
 
 <h2>Running the server</h2>
-<p>Now we can start up the Python server.  <code>pip3 install tornado</code>, then copy the <a href="https://www.tornadoweb.org/en/stable/#hello-world">hello, world</a> sample code in to a file <code>hello_world.py</code>.  Finish off with a strong <code>python3 hello_world.py</code>, and you should be able to open <code>http://public-ip/test</code> and marvel at your results.</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+<p>Now we can start up the Python server.  <code>pip3 install tornado</code>, then copy the <a href="https://www.tornadoweb.org/en/stable/#hello-world">hello, world</a> sample code in to a file <code>hello_world.py</code>.  Finish off with a strong <code>python3 hello_world.py</code>, and you should be able to open <code>http://public-ip/test</code> and marvel at your results.</p>
+    </div><!-- /.entry-content -->
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="https://blog.tedwild.dev/grpc-python.html" rel="bookmark"
-                           title="Permalink to gRPC layout for Python">gRPC layout for Python</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-03-30T20:30:00-07:00">
-                Published: Sat 30 March 2019
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="https://blog.tedwild.dev/author/ted-wild.html">Ted Wild</a>
-        </address>
-<p>In <a href="https://blog.tedwild.dev/category/programming.html">Programming</a>.</p>
-<p>tags: <a href="https://blog.tedwild.dev/tag/grpc.html">gRPC</a> <a href="https://blog.tedwild.dev/tag/python.html">Python</a> <a href="https://blog.tedwild.dev/tag/tips.html">tips</a> </p>
-</footer><!-- /.post-info -->                <p>Setting up a layout for gRPC files that works seamlessly with Python</p>
-                <a class="readmore" href="https://blog.tedwild.dev/grpc-python.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="https://blog.tedwild.dev/c++-smart-pointers.html" rel="bookmark"
-                           title="Permalink to Overview of C++ smart pointers">Overview of C++ smart pointers</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2019-02-17T22:40:00-08:00">
-                Published: Sun 17 February 2019
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="https://blog.tedwild.dev/author/ted-wild.html">Ted Wild</a>
-        </address>
-<p>In <a href="https://blog.tedwild.dev/category/programming.html">Programming</a>.</p>
-<p>tags: <a href="https://blog.tedwild.dev/tag/c.html">C++</a> </p>
-</footer><!-- /.post-info -->                <p>Examples of using C++ smart pointers to manage ownership</p>
-                <a class="readmore" href="https://blog.tedwild.dev/c++-smart-pointers.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>
