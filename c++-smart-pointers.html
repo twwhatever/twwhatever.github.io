@@ -2,17 +2,16 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
         <title>Overview of C++ smart pointers</title>
         <link rel="stylesheet" href="https://blog.tedwild.dev/theme/css/main.css" />
-
-        <!--[if IE]>
-            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
+        <meta name="description" content="Examples of using C++ smart pointers to manage ownership" />
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="https://blog.tedwild.dev/">Ted Wild's Blog </a></h1>
+                <h1><a href="https://blog.tedwild.dev/">Ted Wild's Blog</a></h1>
                 <nav><ul>
                     <li><a href="https://blog.tedwild.dev/category/productivity.html">Productivity</a></li>
                     <li class="active"><a href="https://blog.tedwild.dev/category/programming.html">Programming</a></li>
@@ -38,57 +37,53 @@
         </address>
 <p>In <a href="https://blog.tedwild.dev/category/programming.html">Programming</a>.</p>
 <p>tags: <a href="https://blog.tedwild.dev/tag/c.html">C++</a> </p>
-</footer><!-- /.post-info -->      <p>The problem<sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup>:</p>
-<div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span> <span class="n">get_v</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
+</footer><!-- /.post-info -->      <p>The problem<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">get_v</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">42</span><span class="p">);</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>To ensure there are no memory leaks, the caller must call <code>delete</code> on the
 returned pointer.  I'll use a block scope to illustrate, but in general this issue comes in to play when objects with
 different lifetimes need access to the same data.</p>
-<div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span> <span class="n">copy</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">copy</span><span class="p">;</span>
 
 <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span> <span class="n">orig</span> <span class="o">=</span> <span class="n">get_v</span><span class="p">();</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">orig</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">orig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_v</span><span class="p">();</span>
+<span class="w">    </span><span class="n">copy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">orig</span><span class="p">;</span>
 
-    <span class="c1">// Can&#39;t call delete here (unless you copy v)</span>
+<span class="w">    </span><span class="c1">// Can&#39;t call delete here (unless you copy v)</span>
 <span class="p">}</span>
 
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">copy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="o">*</span><span class="n">copy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 
 <span class="c1">// Have to remember to call delete </span>
-<span class="k">delete</span> <span class="n">copy</span><span class="p">;</span>
-</pre></div>
-
+<span class="k">delete</span><span class="w"> </span><span class="n">copy</span><span class="p">;</span>
+</code></pre></div>
 
 <p>A standard approach to the problem is to have an object manage the lifetime of the vector.</p>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">VOwner</span> <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">v_</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VOwner</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">v_</span><span class="p">;</span>
 <span class="k">public</span><span class="o">:</span>
-    <span class="n">VOwner</span><span class="p">()</span> <span class="o">:</span> <span class="n">v_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span> <span class="p">{}</span>
+<span class="w">    </span><span class="n">VOwner</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">v_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">42</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
 
-    <span class="c1">// Returning a pointer for consistency, but a reference might be a better idea in practice</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span> <span class="n">get_v</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">v_</span><span class="p">;</span> <span class="p">}</span>
+<span class="w">    </span><span class="c1">// Returning a pointer for consistency, but a reference might be a better idea in practice</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">get_v</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">v_</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>In this case, we say that the <code>VOwner</code> object <em>owns</em> the vector.  While that removes the need to delete the vector, the user must now ensure that the VOwner object has a longer lifetime than any caller of <code>VOwner::get_v</code>.</p>
-<div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span> <span class="n">copy</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">copy</span><span class="p">;</span>
 
 <span class="p">{</span>
-    <span class="n">VOwner</span> <span class="n">orig</span><span class="p">;</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">orig</span><span class="p">.</span><span class="n">get_v</span><span class="p">();</span>
-    <span class="c1">// Oops, vector gets destroyed when orig goes out of scope</span>
+<span class="w">    </span><span class="n">VOwner</span><span class="w"> </span><span class="n">orig</span><span class="p">;</span>
+<span class="w">    </span><span class="n">copy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">orig</span><span class="p">.</span><span class="n">get_v</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// Oops, vector gets destroyed when orig goes out of scope</span>
 <span class="p">}</span>
 
 <span class="c1">// Kaboom</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="o">*</span><span class="n">copy</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</pre></div>
-
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">copy</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</code></pre></div>
 
 <p>In many cases the program can be structured so that the owner object
 can outlive all of its users.  However, in some cases this structure
@@ -96,68 +91,65 @@ can be burdensome if lifetime dependencies are hard to unravel, or worse, fundam
 <p>Smart pointers allow safe access to objects on the heap without
 coupling the access to the client object lifetime.</p>
 <h1>Unique pointers</h1>
-<p>Unique pointers (<code>std::unique_ptr</code>) ensure that an object has exactly one owner.  It is possible to change the owner by moving the unique pointer.  That allows us to safely implement the original example<sup id="fnref:2"><a class="footnote-ref" href="#fn:2" rel="footnote">2</a></sup>.</p>
-<div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unqiue_ptr</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">get_unique_v</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
+<p>Unique pointers (<code>std::unique_ptr</code>) ensure that an object has exactly one owner.  It is possible to change the owner by moving the unique pointer.  That allows us to safely implement the original example<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">std</span><span class="o">::</span><span class="n">unqiue_ptr</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">get_unique_v</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">42</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">copy</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">copy</span><span class="p">;</span>
 
 <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">orig</span> <span class="o">=</span> <span class="n">get_unique_v</span><span class="p">();</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">orig</span><span class="p">);</span>
-    <span class="c1">// Now orig can no longer be used to access the vector</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">orig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_unique_v</span><span class="p">();</span>
+<span class="w">    </span><span class="n">copy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">orig</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// Now orig can no longer be used to access the vector</span>
 <span class="p">}</span>
 
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="o">*</span><span class="n">copy</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">copy</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 
 <span class="c1">// The vector will be freed when copy goes out of scope, no need to manually call delete</span>
-</pre></div>
-
+</code></pre></div>
 
 <h1>Shared pointers</h1>
 <p>Another common case is when a single object instance needs to be shared by multiple clients.  This capability is useful when the instance is expensive to construct, for example.  Shared pointers (<code>std::shared_ptr</code>) can be used to allow clients to mutually guarantee the lifetime of a single instance.</p>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">VShared</span> <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">v_</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VShared</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">v_</span><span class="p">;</span>
 <span class="k">public</span><span class="o">:</span>
-    <span class="n">VShared</span><span class="p">()</span> <span class="o">:</span> <span class="n">v_</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">))</span> <span class="p">{}</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">get_v</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">v_</span><span class="p">;</span> <span class="p">}</span>
+<span class="w">    </span><span class="n">VShared</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">v_</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">42</span><span class="p">))</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">get_v</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">v_</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
 <span class="p">};</span>
 
-<span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">copy</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">copy</span><span class="p">;</span>
 
 <span class="p">{</span>
-    <span class="n">VShared</span> <span class="n">orig</span><span class="p">;</span>
+<span class="w">    </span><span class="n">VShared</span><span class="w"> </span><span class="n">orig</span><span class="p">;</span>
 
-    <span class="c1">// Assignent operator increments reference count, so the vector</span>
-    <span class="c1">// remains after orig goes after scope</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">orig</span><span class="p">.</span><span class="n">get_v</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// Assignent operator increments reference count, so the vector</span>
+<span class="w">    </span><span class="c1">// remains after orig goes after scope</span>
+<span class="w">    </span><span class="n">copy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">orig</span><span class="p">.</span><span class="n">get_v</span><span class="p">();</span>
 <span class="p">}</span>
 
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="o">*</span><span class="n">copy</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</pre></div>
-
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">copy</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</code></pre></div>
 
 <h1>Weak pointers</h1>
 <p>The above example will persist the vector until the VShared object is
 deleted.  In some cases, one might prefer to release the object if no
 clients are actively using it, while still avoiding creating multiple
 instances if one already exists.  Weak pointers (<code>std::weak_ptr</code>) allow safe access to objects managed by <code>std::shared_ptr</code> without participating in the lifetime of the object.</p>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">VCached</span> <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">weak_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">v_</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VCached</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">weak_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">v_</span><span class="p">;</span>
 <span class="k">public</span><span class="o">:</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">get_v</span><span class="p">()</span> <span class="p">{</span>
-        <span class="k">auto</span> <span class="n">candidate</span> <span class="o">=</span>  <span class="n">v_</span><span class="p">.</span><span class="n">lock</span><span class="p">();</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">candidate</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="n">candidate</span><span class="p">;</span>
-        <span class="p">}</span>
-        <span class="k">auto</span> <span class="n">v</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
-        <span class="n">v_</span> <span class="o">=</span> <span class="n">v</span><span class="p">;</span>
-        <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
-    <span class="p">}</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">get_v</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="n">candidate</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">v_</span><span class="p">.</span><span class="n">lock</span><span class="p">();</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">candidate</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">candidate</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">42</span><span class="p">);</span>
+<span class="w">        </span><span class="n">v_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">v</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Note that the nature of weak pointers is that the object they point to
 may not exist.  The benefit they have over raw pointers is that
@@ -167,10 +159,10 @@ leads to a controlled failure.</p>
 <hr>
 <ol>
 <li id="fn:1">
-<p><code>std::vector&lt;int&gt;</code> is being used here for illustration.  I typically run in to this problem with complex objects that require a lot of context to initialize, but can then be used after initialization by different clients.&#160;<a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p><code>std::vector&lt;int&gt;</code> is being used here for illustration.  I typically run in to this problem with complex objects that require a lot of context to initialize, but can then be used after initialization by different clients.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:2">
-<p>There is an important technical caveat to this statement, however.  The smart pointers themselves must be copied, not the contents of the smart     pointer.&#160;<a class="footnote-backref" href="#fnref:2" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p>There is an important technical caveat to this statement, however.  The smart pointers themselves must be copied, not the contents of the smart     pointer.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
@@ -198,10 +190,10 @@ leads to a controlled failure.</p>
 
         <footer id="contentinfo" class="body">
                 <address id="about" class="vcard body">
-                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
                 </address><!-- /#about -->
 
-                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
         </footer><!-- /#contentinfo -->
 
 </body>

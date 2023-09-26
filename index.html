@@ -2,17 +2,15 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
         <title>Ted Wild's Blog</title>
         <link rel="stylesheet" href="https://blog.tedwild.dev/theme/css/main.css" />
-
-        <!--[if IE]>
-            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="https://blog.tedwild.dev/">Ted Wild's Blog </a></h1>
+                <h1><a href="https://blog.tedwild.dev/">Ted Wild's Blog</a></h1>
                 <nav><ul>
                     <li><a href="https://blog.tedwild.dev/category/productivity.html">Productivity</a></li>
                     <li><a href="https://blog.tedwild.dev/category/programming.html">Programming</a></li>
@@ -22,7 +20,37 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="https://blog.tedwild.dev/aws-ec2-setup.html">Setting up AWS EC2 instances for system design</a></h1>
+                    <h1 class="entry-title"><a href="https://blog.tedwild.dev/pelican-deployment-with-github-actions.html">Pelican deployment with GitHub Actions</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2023-09-25T21:00:00-07:00">
+                Published: Mon 25 September 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="https://blog.tedwild.dev/author/ted.html">Ted</a>
+        </address>
+<p>In <a href="https://blog.tedwild.dev/category/productivity.html">Productivity</a>.</p>
+<p>tags: <a href="https://blog.tedwild.dev/tag/github.html">github</a> <a href="https://blog.tedwild.dev/tag/pelican.html">pelican</a> </p>
+</footer><!-- /.post-info --><h1>Can we build the blog with GitHub Actions?</h1>
+<p>I wonder if that would make me more likely to post here.</p>
+<p>Right now, I have a convoluted setup that requires me to get out an old laptop.</p>
+<p>It looks like it's possible to trigger actions.  But maybe my requirements are too out of date:</p>
+<div class="highlight"><pre><span></span><code>          <span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span><span class="p">,</span> <span class="n">Feature</span>
+      <span class="ne">ImportError</span><span class="p">:</span> <span class="n">cannot</span> <span class="kn">import</span> <span class="nn">name</span> <span class="s1">&#39;Feature&#39;</span> <span class="kn">from</span> <span class="s1">&#39;setuptools&#39;</span>
+</code></pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="https://blog.tedwild.dev/aws-ec2-setup.html" rel="bookmark"
+                           title="Permalink to Setting up AWS EC2 instances for system design">Setting up AWS EC2 instances for system design</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2022-01-20T16:00:00-08:00">
                 Published: Thu 20 January 2022
@@ -33,42 +61,10 @@
         </address>
 <p>In <a href="https://blog.tedwild.dev/category/studying.html">Studying</a>.</p>
 <p>tags: <a href="https://blog.tedwild.dev/tag/aws.html">AWS</a> <a href="https://blog.tedwild.dev/tag/python.html">Python</a> <a href="https://blog.tedwild.dev/tag/nginx.html">NGINX</a> </p>
-</footer><!-- /.post-info --><p>I found a bunch of system design learning material fairly abstract, which makes me feel less confident.  The goal is to make things more concrete by setting up some of the problems and playing around with the implementations.  The result's obviously not going to be production grade, but it should be enough to gain some confidence in some specific points.</p>
-<p>One of the neat things about the modern cloud providers is that you can play around with large scale systems directly.  It seems to me like it should be possible to set up a playground that lets you dig in to real design issues to the depth you want.  You can configure provided pieces at a high level, and drill in to the specific components to whatever level of detail you want.</p>
-<h1>Running a Python webserver</h1>
-<p>These instructions are to get the <a href="https://www.tornadoweb.org/en/stable/">Tornado</a> server running and accessible on an EC2 instance.  The idea isn't to demonstrate brilliant use of AWS capabilities at this point, but to get something very basic set up so that you can iterate on it.</p>
-<h2>Configuring an EC2 instance</h2>
-<p>More or less <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html">any tutorial</a> for getting an EC2 instance set up and connected should work.  When setting up the security groups, make sure to allow SSH, HTTP and HTTPS inbound traffic (by default, I think you only get SSH).</p>
-<p>Make sure to download the <code>.pem</code> file so you can connect to your instance.  I needed to update the permissions to get it to work, for example</p>
-<div class="highlight"><pre><span></span>chmod 400 ~/Downloads/key.pem
-ssh -i ~/Downloads/key.pem ec2-user@public-dns
-</pre></div>
-
-
-<p>Note that you may want to store the key somewhere more durable.  I don't really care too much, since these are temporary machines for me to mess around with.</p>
-<h2>Setting up NGINX</h2>
-<p>By default, the inbound HTTP rule only opens up port 80.  Applications run without sudo won't have access to that port.  You can obviously just run everything via sudo, but it's easy enough to use NGINX to forward traffic from port 80 to any other port you want.</p>
-<p>Install and start NGINX:</p>
-<div class="highlight"><pre><span></span>sudo amazon-linux-extras install nginx1
-sudo systemctl start nginx.service
-</pre></div>
-
-
-<p>You should now see the NGINX test page when you open the URL for your EC2 instance.  You can then configure it by editing <code>/etc/nginx/nginx.conf</code> and restarting NGINX with <code>sudo nginx -s reload</code>.  <a href="https://gist.github.com/soheilhy/8b94347ff8336d971ad0">This tutorial</a> has a bunch of good basics for NGINX forwarding rules.  In this case, we can forward requests for a given path to a Tornado service that we'll set up.  Add the following to the <code>server</code> section:</p>
-<div class="highlight"><pre><span></span>    <span class="k">location</span> <span class="s">/test</span> <span class="p">{</span>
-        <span class="kn">rewrite</span> <span class="s">^/test(.*)</span> <span class="s">/</span><span class="nv">$1</span> <span class="s">break</span><span class="p">;</span>
-        <span class="kn">proxy_pass</span> <span class="s">http://127.0.0.1:8888</span><span class="p">;</span>
-    <span class="p">}</span>
-</pre></div>
-
-
-<h2>Running the server</h2>
-<p>Now we can start up the Python server.  <code>pip3 install tornado</code>, then copy the <a href="https://www.tornadoweb.org/en/stable/#hello-world">hello, world</a> sample code in to a file <code>hello_world.py</code>.  Finish off with a strong <code>python3 hello_world.py</code>, and you should be able to open <code>http://public-ip/test</code> and marvel at your results.</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Getting an EC2 instance set up for messing around with Python system design</p>
+                <a class="readmore" href="https://blog.tedwild.dev/aws-ec2-setup.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -117,9 +113,8 @@ sudo systemctl start nginx.service
 <p>tags: <a href="https://blog.tedwild.dev/tag/tips.html">tips</a> <a href="https://blog.tedwild.dev/tag/torchscript.html">torchscript</a> </p>
 </footer><!-- /.post-info -->                <h1>Full tensors in Torchscript</h1>
 <p>I was productizing some PyTorch models recently and ran in to an issue with the way <code>torch.full_like</code> behaves in Torchscript.</p>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">torch</span>
+</code></pre></div>
 
 <p>The original code use <code>torch.full_like</code> to create a tensor with a given shape.  It also forced the type of the new tensor …</p>
                 <a class="readmore" href="https://blog.tedwild.dev/full-tensors-in-torchscript.html">read more</a>
@@ -214,10 +209,10 @@ sudo systemctl start nginx.service
 
         <footer id="contentinfo" class="body">
                 <address id="about" class="vcard body">
-                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
                 </address><!-- /#about -->
 
-                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
         </footer><!-- /#contentinfo -->
 
 </body>
