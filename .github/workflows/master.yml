@@ -2,7 +2,7 @@ name: Pelican site CI
 
 on:
   # Trigger the workflow on push or pull request,
-  # but only for the master branch
+  # but only for the source branch
   push:
     branches:
       - source

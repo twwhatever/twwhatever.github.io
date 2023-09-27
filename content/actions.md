@@ -1,3 +1,8 @@
+Title: Pelican deployment with GitHub Actions
+Date: 2023-09-25 21:00
+Category: Productivity
+Tags: github, pelican
+
 # Can we build the blog with GitHub Actions?
 
 I wonder if that would make me more likely to post here.
