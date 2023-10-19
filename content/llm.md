@@ -2,8 +2,33 @@ Family members have been asking me about ChatGPT in recent gatherings. I have a
 bunch of opinions about ChatGPT, and wanted to put my thoughts together. And
 hopefully explain them.
 
-ChatGPT, Google Bard, MetaAI and similar models are known as *large language
-models*.  A "language model" is a computer program that ???
+ChatGPT, Google Bard, MetaAI are based on technology known as *large language
+models*. There's a bit of jargon to unpack, here.
+
+A *language model* is a computer program that generates probabilities of a
+series of words. *Model* is borrowed from physics, where it means a mathematical
+representation of a real phenomenon. It's arguable what real phenomenon is
+represented by a language model, though, so I think it's best understood as a
+set phrase.
+
+So you provide a langauge model with a series of words, and the result is
+probabilities (i.e., numbers). What the "probabilities" represent has much to do
+with the details of how the models are defined and trained. The important thing
+is that they're numbers, which allows programmers to change questions about
+*language*
+
+  What is the best word to complete this sentence: The apple is ____.
+
+Into questions about *numbers*
+
+  What word gives us the sentence with the HIGHEST NUMBERS: The apple is ____.
+
+The former is essentially impossible. Is it red? Is it tasty? Is it rotten? Is
+it falling? The latter is something drummed into the skull of every undergraduate
+computer science student. 
+
+
+A "language model" is a computer program that ???
 
   **TODO**: Is there a layperson definition I can give here?  I'm not sure if it's important for the point I want to make, though.  Maybe just ChatGPT throughout?
 
