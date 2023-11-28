@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>Ted Wild's Blog - Studying</title>
+        <link rel="stylesheet" href="https://blog.tedwild.dev/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="https://blog.tedwild.dev/">Ted Wild's Blog</a></h1>
+                <nav><ul>
+                    <li><a href="https://blog.tedwild.dev/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="https://blog.tedwild.dev/category/productivity.html">Productivity</a></li>
+                    <li><a href="https://blog.tedwild.dev/category/programming.html">Programming</a></li>
+                    <li class="active"><a href="https://blog.tedwild.dev/category/studying.html">Studying</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="https://blog.tedwild.dev/aws-ec2-setup.html">Setting up AWS EC2 instances for system design</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2022-01-20T16:00:00-08:00">
+                Published: Thu 20 January 2022
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="https://blog.tedwild.dev/author/ted-wild.html">Ted Wild</a>
+        </address>
+<p>In <a href="https://blog.tedwild.dev/category/studying.html">Studying</a>.</p>
+<p>tags: <a href="https://blog.tedwild.dev/tag/aws.html">AWS</a> <a href="https://blog.tedwild.dev/tag/python.html">Python</a> <a href="https://blog.tedwild.dev/tag/nginx.html">NGINX</a> </p>
+</footer><!-- /.post-info --><p>I found a bunch of system design learning material fairly abstract, which makes me feel less confident.  The goal is to make things more concrete by setting up some of the problems and playing around with the implementations.  The result's obviously not going to be production grade, but it should be enough to gain some confidence in some specific points.</p>
+<p>One of the neat things about the modern cloud providers is that you can play around with large scale systems directly.  It seems to me like it should be possible to set up a playground that lets you dig in to real design issues to the depth you want.  You can configure provided pieces at a high level, and drill in to the specific components to whatever level of detail you want.</p>
+<h1>Running a Python webserver</h1>
+<p>These instructions are to get the <a href="https://www.tornadoweb.org/en/stable/">Tornado</a> server running and accessible on an EC2 instance.  The idea isn't to demonstrate brilliant use of AWS capabilities at this point, but to get something very basic set up so that you can iterate on it.</p>
+<h2>Configuring an EC2 instance</h2>
+<p>More or less <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html">any tutorial</a> for getting an EC2 instance set up and connected should work.  When setting up the security groups, make sure to allow SSH, HTTP and HTTPS inbound traffic (by default, I think you only get SSH).</p>
+<p>Make sure to download the <code>.pem</code> file so you can connect to your instance.  I needed to update the permissions to get it to work, for example</p>
+<div class="highlight"><pre><span></span><code><span class="n">chmod</span><span class="w"> </span><span class="mi">400</span><span class="w"> </span><span class="o">~/</span><span class="n">Downloads</span><span class="o">/</span><span class="n">key</span><span class="o">.</span><span class="n">pem</span>
+<span class="n">ssh</span><span class="w"> </span><span class="o">-</span><span class="n">i</span><span class="w"> </span><span class="o">~/</span><span class="n">Downloads</span><span class="o">/</span><span class="n">key</span><span class="o">.</span><span class="n">pem</span><span class="w"> </span><span class="n">ec2</span><span class="o">-</span><span class="n">user</span><span class="err">@</span><span class="n">public</span><span class="o">-</span><span class="n">dns</span>
+</code></pre></div>
+
+<p>Note that you may want to store the key somewhere more durable.  I don't really care too much, since these are temporary machines for me to mess around with.</p>
+<h2>Setting up NGINX</h2>
+<p>By default, the inbound HTTP rule only opens up port 80.  Applications run without sudo won't have access to that port.  You can obviously just run everything via sudo, but it's easy enough to use NGINX to forward traffic from port 80 to any other port you want.</p>
+<p>Install and start NGINX:</p>
+<div class="highlight"><pre><span></span><code>sudo amazon-linux-extras install nginx1
+sudo systemctl start nginx.service
+</code></pre></div>
+
+<p>You should now see the NGINX test page when you open the URL for your EC2 instance.  You can then configure it by editing <code>/etc/nginx/nginx.conf</code> and restarting NGINX with <code>sudo nginx -s reload</code>.  <a href="https://gist.github.com/soheilhy/8b94347ff8336d971ad0">This tutorial</a> has a bunch of good basics for NGINX forwarding rules.  In this case, we can forward requests for a given path to a Tornado service that we'll set up.  Add the following to the <code>server</code> section:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="k">location</span><span class="w"> </span><span class="s">/test</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kn">rewrite</span><span class="w"> </span><span class="s">^/test(.*)</span><span class="w"> </span><span class="s">/</span><span class="nv">$1</span><span class="w"> </span><span class="s">break</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://127.0.0.1:8888</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+
+<h2>Running the server</h2>
+<p>Now we can start up the Python server.  <code>pip3 install tornado</code>, then copy the <a href="https://www.tornadoweb.org/en/stable/#hello-world">hello, world</a> sample code in to a file <code>hello_world.py</code>.  Finish off with a strong <code>python3 hello_world.py</code>, and you should be able to open <code>http://public-ip/test</code> and marvel at your results.</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="https://blog.tedwild.dev/anki-settings-after-a-long-break.html" rel="bookmark"
+                           title="Permalink to Anki settings after a long break">Anki settings after a long break</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2020-06-18T19:30:00-07:00">
+                Published: Thu 18 June 2020
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="https://blog.tedwild.dev/author/ted.html">Ted</a>
+        </address>
+<p>In <a href="https://blog.tedwild.dev/category/studying.html">Studying</a>.</p>
+<p>tags: <a href="https://blog.tedwild.dev/tag/anki.html">anki</a> <a href="https://blog.tedwild.dev/tag/tips.html">tips</a> </p>
+</footer><!-- /.post-info -->                <h1>Anki settings after a long break</h1>
+<p>The standard advice when returning to an Anki deck after a long break is</p>
+<ol>
+<li>Create a filtered deck that contains cards that are recently due (say, within a week)</li>
+<li>Review remaining backlog little by little until all reviews are cleared</li>
+</ol>
+<p>The idea is that …</p>
+                <a class="readmore" href="https://blog.tedwild.dev/anki-settings-after-a-long-break.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://blog.tedwild.dev/extras/tedwild.pdf">Résumé</a></li>
+                            <li><a href="http://pages.cs.wisc.edu/~wildt/">My old page</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="https://www.linkedin.com/in/ted-wild">LinkedIn</a></li>
+                            <li><a href="https://github.com/twwhatever">GitHub</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

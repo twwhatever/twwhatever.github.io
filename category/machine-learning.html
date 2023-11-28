@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>Ted Wild's Blog - Machine Learning</title>
+        <link rel="stylesheet" href="https://blog.tedwild.dev/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="https://blog.tedwild.dev/">Ted Wild's Blog</a></h1>
+                <nav><ul>
+                    <li class="active"><a href="https://blog.tedwild.dev/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="https://blog.tedwild.dev/category/productivity.html">Productivity</a></li>
+                    <li><a href="https://blog.tedwild.dev/category/programming.html">Programming</a></li>
+                    <li><a href="https://blog.tedwild.dev/category/studying.html">Studying</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="https://blog.tedwild.dev/running-llm-on-an-m2-macbook-air.html">Running LLM on an M2 Macbook Air</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2023-11-27T20:00:00-08:00">
+                Published: Mon 27 November 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="https://blog.tedwild.dev/author/ted.html">Ted</a>
+        </address>
+<p>In <a href="https://blog.tedwild.dev/category/machine-learning.html">Machine Learning</a>.</p>
+<p>tags: <a href="https://blog.tedwild.dev/tag/tips.html">tips</a> </p>
+</footer><!-- /.post-info --><p>I wanted to see if I could run an LLM on my personal Macbook Air.  I don't expect magic, but
+thought it'd be interesting to play around with prompts and such without having to worry about
+cloud costs or internet connections.</p>
+<p>Instructions are mostly from <a href="https://simonwillison.net/2023/Aug/1/llama-2-mac/">this blog</a>, which
+appears to be a bit out of date as of this writing.  The updated instructions on 
+<a href="https://github.com/simonw/llm-llama-cpp/tree/main">Github</a> did work.</p>
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>llm
+llm<span class="w"> </span>install<span class="w"> </span>llm-llama-cpp
+llm<span class="w"> </span>install<span class="w"> </span>llama-cpp-python
+llm<span class="w"> </span>llama-cpp<span class="w"> </span>download-model<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q2_K.gguf<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--alias<span class="w"> </span>llama2-chat<span class="w"> </span>--alias<span class="w"> </span>l2c<span class="w"> </span>--llama2-chat
+llm<span class="w"> </span>-m<span class="w"> </span>l2c<span class="w"> </span><span class="s1">&#39;Tell me a joke about a llama&#39;</span><span class="w"> </span>--system<span class="w"> </span><span class="s1">&#39;You are very funny&#39;</span>
+</code></pre></div>
+
+<p>One troubleshooting tip:  adding <code>-o verbose 1</code> helped me realize what was wrong with the first
+instructions I tried.</p>
+<div class="highlight"><pre><span></span><code>llm<span class="w"> </span>-m<span class="w"> </span>l2c<span class="w"> </span><span class="s1">&#39;Tell me a joke about a llama&#39;</span><span class="w"> </span>-o<span class="w"> </span>verbose<span class="w"> </span><span class="m">1</span>
+</code></pre></div>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://blog.tedwild.dev/extras/tedwild.pdf">Résumé</a></li>
+                            <li><a href="http://pages.cs.wisc.edu/~wildt/">My old page</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="https://www.linkedin.com/in/ted-wild">LinkedIn</a></li>
+                            <li><a href="https://github.com/twwhatever">GitHub</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
