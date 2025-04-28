@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>Ted Wild's Blog - Ted</title>
+        <link rel="stylesheet" href="https://blog.tedwild.dev/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="https://blog.tedwild.dev/">Ted Wild's Blog</a></h1>
+                <nav><ul>
+                    <li><a href="https://blog.tedwild.dev/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="https://blog.tedwild.dev/category/productivity.html">Productivity</a></li>
+                    <li><a href="https://blog.tedwild.dev/category/programming.html">Programming</a></li>
+                    <li><a href="https://blog.tedwild.dev/category/studying.html">Studying</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="https://blog.tedwild.dev/running-llm-on-an-m2-macbook-air.html">Running LLM on an M2 Macbook Air</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2023-11-27T20:00:00-08:00">
+                Published: Mon 27 November 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="https://blog.tedwild.dev/author/ted.html">Ted</a>
+        </address>
+<p>In <a href="https://blog.tedwild.dev/category/machine-learning.html">Machine Learning</a>.</p>
+<p>tags: <a href="https://blog.tedwild.dev/tag/tips.html">tips</a> </p>
+</footer><!-- /.post-info --><p>I wanted to see if I could run an LLM on my personal Macbook Air.  I don't expect magic, but
+thought it'd be interesting to play around with prompts and such without having to worry about
+cloud costs or internet connections.</p>
+<p>Instructions are mostly from <a href="https://simonwillison.net/2023/Aug/1/llama-2-mac/">this blog</a>, which
+appears to be a bit out of date as of this writing.  The updated instructions on 
+<a href="https://github.com/simonw/llm-llama-cpp/tree/main">Github</a> did work.</p>
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>llm
+llm<span class="w"> </span>install<span class="w"> </span>llm-llama-cpp
+llm<span class="w"> </span>install<span class="w"> </span>llama-cpp-python
+llm<span class="w"> </span>llama-cpp<span class="w"> </span>download-model<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q2_K.gguf<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--alias<span class="w"> </span>llama2-chat<span class="w"> </span>--alias<span class="w"> </span>l2c<span class="w"> </span>--llama2-chat
+llm<span class="w"> </span>-m<span class="w"> </span>l2c<span class="w"> </span><span class="s1">&#39;Tell me a joke about a llama&#39;</span><span class="w"> </span>--system<span class="w"> </span><span class="s1">&#39;You are very funny&#39;</span>
+</code></pre></div>
+
+<p>One troubleshooting tip:  adding <code>-o verbose 1</code> helped me realize what was wrong with the first
+instructions I tried.</p>
+<div class="highlight"><pre><span></span><code>llm<span class="w"> </span>-m<span class="w"> </span>l2c<span class="w"> </span><span class="s1">&#39;Tell me a joke about a llama&#39;</span><span class="w"> </span>-o<span class="w"> </span>verbose<span class="w"> </span><span class="m">1</span>
+</code></pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="https://blog.tedwild.dev/pelican-deployment-with-github-actions.html" rel="bookmark"
+                           title="Permalink to Pelican deployment with GitHub Actions">Pelican deployment with GitHub Actions</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-09-27T20:00:00-07:00">
+                Published: Wed 27 September 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="https://blog.tedwild.dev/author/ted.html">Ted</a>
+        </address>
+<p>In <a href="https://blog.tedwild.dev/category/productivity.html">Productivity</a>.</p>
+<p>tags: <a href="https://blog.tedwild.dev/tag/github.html">github</a> <a href="https://blog.tedwild.dev/tag/pelican.html">pelican</a> </p>
+</footer><!-- /.post-info -->                <h1>Pelican deployment with GitHub Actions</h1>
+<p>I originally decided to use Pelican for this blog because I wanted to get more
+practice with Python. Now I don't really have that motivation, but I don't
+really want to spend time switching.</p>
+<p>I had Pelican set up on one of my personal laptops …</p>
+                <a class="readmore" href="https://blog.tedwild.dev/pelican-deployment-with-github-actions.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="https://blog.tedwild.dev/anki-settings-after-a-long-break.html" rel="bookmark"
+                           title="Permalink to Anki settings after a long break">Anki settings after a long break</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2020-06-18T19:30:00-07:00">
+                Published: Thu 18 June 2020
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="https://blog.tedwild.dev/author/ted.html">Ted</a>
+        </address>
+<p>In <a href="https://blog.tedwild.dev/category/studying.html">Studying</a>.</p>
+<p>tags: <a href="https://blog.tedwild.dev/tag/anki.html">anki</a> <a href="https://blog.tedwild.dev/tag/tips.html">tips</a> </p>
+</footer><!-- /.post-info -->                <h1>Anki settings after a long break</h1>
+<p>The standard advice when returning to an Anki deck after a long break is</p>
+<ol>
+<li>Create a filtered deck that contains cards that are recently due (say, within a week)</li>
+<li>Review remaining backlog little by little until all reviews are cleared</li>
+</ol>
+<p>The idea is that …</p>
+                <a class="readmore" href="https://blog.tedwild.dev/anki-settings-after-a-long-break.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="https://blog.tedwild.dev/full-tensors-in-torchscript.html" rel="bookmark"
+                           title="Permalink to Full tensors in Torchscript">Full tensors in Torchscript</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2020-02-08T13:30:00-08:00">
+                Published: Sat 08 February 2020
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="https://blog.tedwild.dev/author/ted.html">Ted</a>
+        </address>
+<p>In <a href="https://blog.tedwild.dev/category/programming.html">Programming</a>.</p>
+<p>tags: <a href="https://blog.tedwild.dev/tag/tips.html">tips</a> <a href="https://blog.tedwild.dev/tag/torchscript.html">torchscript</a> </p>
+</footer><!-- /.post-info -->                <h1>Full tensors in Torchscript</h1>
+<p>I was productizing some PyTorch models recently and ran in to an issue with the way <code>torch.full_like</code> behaves in Torchscript.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">torch</span>
+</code></pre></div>
+
+<p>The original code use <code>torch.full_like</code> to create a tensor with a given shape.  It also forced the type of the new tensor …</p>
+                <a class="readmore" href="https://blog.tedwild.dev/full-tensors-in-torchscript.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="https://blog.tedwild.dev/experimenting-with-vim-emulations-in-all-apps.html" rel="bookmark"
+                           title="Permalink to Experimenting with Vim emulations in all apps">Experimenting with Vim emulations in all apps</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2020-01-01T04:30:00-08:00">
+                Published: Wed 01 January 2020
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="https://blog.tedwild.dev/author/ted.html">Ted</a>
+        </address>
+<p>In <a href="https://blog.tedwild.dev/category/productivity.html">Productivity</a>.</p>
+<p>tags: <a href="https://blog.tedwild.dev/tag/vanity.html">vanity</a> <a href="https://blog.tedwild.dev/tag/vim.html">vim</a> </p>
+</footer><!-- /.post-info -->                <h1>Background</h1>
+<p>I spent the first ten years of my career using Linux machines, and the next 11 years using Windows for my day-to-day work.  I used a Mac laptop during that time as my personal device.  However, I'd only occasionally do small personal projects with it.   I never really used …</p>
+                <a class="readmore" href="https://blog.tedwild.dev/experimenting-with-vim-emulations-in-all-apps.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://blog.tedwild.dev/extras/tedwild.pdf">Résumé</a></li>
+                            <li><a href="http://pages.cs.wisc.edu/~wildt/">My old page</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="https://www.linkedin.com/in/ted-wild">LinkedIn</a></li>
+                            <li><a href="https://github.com/twwhatever">GitHub</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
